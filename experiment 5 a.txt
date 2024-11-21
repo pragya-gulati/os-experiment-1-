@@ -1,0 +1,58 @@
+i) FCFS with Arrival Time
+
+import java.util.*;
+
+class Process {
+    int pid; // Process ID
+    int arrivalTime; // Arrival time of the process
+    int burstTime; // Burst time of the process
+    int completionTime; // Completion time of the process
+    int waitingTime; // Waiting time of the process
+    int turnAroundTime; // Turnaround time of the process
+
+    public Process(int pid, int arrivalTime, int burstTime) {
+        this.pid = pid;
+        this.arrivalTime = arrivalTime;
+        this.burstTime = burstTime;
+    }
+}
+
+public class FCFSWithArrivalTime {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        
+        System.out.println("Enter the number of processes:");
+        int n = scanner.nextInt();
+        Process[] processes = new Process[n];
+
+        for (int i = 0; i < n; i++) {
+            System.out.println("Enter arrival time and burst time for process " + (i + 1) + ":");
+            int arrivalTime = scanner.nextInt();
+            int burstTime = scanner.nextInt();
+            processes[i] = new Process(i + 1, arrivalTime, burstTime);
+        }
+
+        // Sort processes by arrival time
+        Arrays.sort(processes, Comparator.comparingInt(p -> p.arrivalTime));
+
+        int currentTime = 0;
+        for (Process process : processes) {
+            if (currentTime < process.arrivalTime) {
+                currentTime = process.arrivalTime;
+            }
+            process.completionTime = currentTime + process.burstTime;
+            process.turnAroundTime = process.completionTime - process.arrivalTime;
+            process.waitingTime = process.turnAroundTime - process.burstTime;
+            currentTime = process.completionTime;
+        }
+
+        System.out.println("\nProcess\tArrival Time\tBurst Time\tCompletion Time\tTurnaround Time\tWaiting Time");
+        for (Process process : processes) {
+            System.out.println("P" + process.pid + "\t\t" + process.arrivalTime + "\t\t" + process.burstTime + "\t\t" +
+                    process.completionTime + "\t\t" + process.turnAroundTime + "\t\t" + process.waitingTime);
+        }
+
+        scanner.close();
+    }
+}

@@ -1,0 +1,55 @@
+def priority_scheduling(processes):
+    # Sort processes based on priority (and arrival time for tie-breaking)
+    processes.sort(key=lambda x: (x['priority'], x['arrival_time']))
+    
+    n = len(processes)
+    current_time = 0
+    completed = 0
+    waiting_time = [0] * n
+    turnaround_time = [0] * n
+    completion_time = [0] * n
+    is_completed = [False] * n
+
+    while completed != n:
+        # Find the process with the highest priority that has arrived and is not completed
+        idx = -1
+        highest_priority = float('inf')
+        for i in range(n):
+            if (
+                not is_completed[i] and
+                processes[i]['arrival_time'] <= current_time and
+                processes[i]['priority'] < highest_priority
+            ):
+                highest_priority = processes[i]['priority']
+                idx = i
+
+        if idx != -1:
+            # Process the selected process
+            current_time += processes[idx]['burst_time']
+            completion_time[idx] = current_time
+            turnaround_time[idx] = completion_time[idx] - processes[idx]['arrival_time']
+            waiting_time[idx] = turnaround_time[idx] - processes[idx]['burst_time']
+            is_completed[idx] = True
+            completed += 1
+        else:
+            # No process is ready, move time forward
+            current_time += 1
+
+    # Print results
+    print("Process\tArrival\tBurst\tPriority\tCompletion\tTurnaround\tWaiting")
+    for i in range(n):
+        print(
+            f"P{i+1}\t{processes[i]['arrival_time']}\t{processes[i]['burst_time']}\t{processes[i]['priority']}\t\t"
+            f"{completion_time[i]}\t\t{turnaround_time[i]}\t\t{waiting_time[i]}"
+        )
+
+# Example Input
+processes = [
+    {'arrival_time': 0, 'burst_time': 10, 'priority': 3},  # Process 1
+    {'arrival_time': 1, 'burst_time': 1, 'priority': 1},   # Process 2
+    {'arrival_time': 2, 'burst_time': 2, 'priority': 4},   # Process 3
+    {'arrival_time': 3, 'burst_time': 1, 'priority': 2},   # Process 4
+]
+
+# Call the Priority Scheduling function
+priority_scheduling(processes)

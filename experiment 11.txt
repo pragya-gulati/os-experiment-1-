@@ -1,0 +1,159 @@
+import java.util.Scanner;
+
+public class BankersAlgorithm {
+    private int[][] need, allocate, max, available;
+    private int numProcesses, numResources;
+
+    public void input() {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter the number of processes: ");
+        numProcesses = scanner.nextInt();
+
+        System.out.print("Enter the number of resources: ");
+        numResources = scanner.nextInt();
+
+        max = new int[numProcesses][numResources];
+        allocate = new int[numProcesses][numResources];
+        need = new int[numProcesses][numResources];
+        available = new int[numResources];
+
+        System.out.println("Enter the allocation matrix:");
+        for (int i = 0; i < numProcesses; i++) {
+            for (int j = 0; j < numResources; j++) {
+                allocate[i][j] = scanner.nextInt();
+            }
+        }
+
+        System.out.println("Enter the max matrix:");
+        for (int i = 0; i < numProcesses; i++) {
+            for (int j = 0; j < numResources; j++) {
+                max[i][j] = scanner.nextInt();
+            }
+        }
+
+        System.out.println("Enter the available resources:");
+        for (int i = 0; i < numResources; i++) {
+            available[i] = scanner.nextInt();
+        }
+
+        // Calculate the need matrix
+        for (int i = 0; i < numProcesses; i++) {
+            for (int j = 0; j < numResources; j++) {
+                need[i][j] = max[i][j] - allocate[i][j];
+            }
+        }
+
+        scanner.close();
+    }
+
+    private boolean checkSafety() {
+        boolean[] finish = new boolean[numProcesses];
+        int[] work = available.clone();
+        int[] safeSequence = new int[numProcesses];
+        int count = 0;
+
+        while (count < numProcesses) {
+            boolean found = false;
+
+            for (int i = 0; i < numProcesses; i++) {
+                if (!finish[i]) {
+                    boolean canAllocate = true;
+                    for (int j = 0; j < numResources; j++) {
+                        if (need[i][j] > work[j]) {
+                            canAllocate = false;
+                            break;
+                        }
+                    }
+
+                    if (canAllocate) {
+                        for (int j = 0; j < numResources; j++) {
+                            work[j] += allocate[i][j];
+                        }
+                        safeSequence[count++] = i;
+                        finish[i] = true;
+                        found = true;
+                    }
+                }
+            }
+
+            if (!found) {
+                System.out.println("The system is in an unsafe state.");
+                return false;
+            }
+        }
+
+        System.out.println("The system is in a safe state.");
+        System.out.print("Safe sequence: ");
+        for (int i = 0; i < numProcesses; i++) {
+            System.out.print("P" + safeSequence[i] + " ");
+        }
+        System.out.println();
+
+        return true;
+    }
+
+    public boolean requestResources(int processId, int[] request) {
+        // Check if request <= need
+        for (int i = 0; i < numResources; i++) {
+            if (request[i] > need[processId][i]) {
+                System.out.println("Error: Process has exceeded its maximum claim.");
+                return false;
+            }
+        }
+
+        // Check if request <= available
+        for (int i = 0; i < numResources; i++) {
+            if (request[i] > available[i]) {
+                System.out.println("Resources are not available.");
+                return false;
+            }
+        }
+
+        // Temporarily allocate resources
+        for (int i = 0; i < numResources; i++) {
+            available[i] -= request[i];
+            allocate[processId][i] += request[i];
+            need[processId][i] -= request[i];
+        }
+
+        // Check system state
+        if (checkSafety()) {
+            return true; // Request granted
+        }
+
+        // Rollback allocation
+        for (int i = 0; i < numResources; i++) {
+            available[i] += request[i];
+            allocate[processId][i] -= request[i];
+            need[processId][i] += request[i];
+        }
+
+        System.out.println("Request cannot be granted as it leads to an unsafe state.");
+        return false;
+    }
+
+    public static void main(String[] args) {
+        BankersAlgorithm bankersAlgorithm = new BankersAlgorithm();
+        bankersAlgorithm.input();
+
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter the process ID making the request: ");
+        int processId = scanner.nextInt();
+
+        int[] request = new int[bankersAlgorithm.numResources];
+        System.out.println("Enter the resource request:");
+        for (int i = 0; i < bankersAlgorithm.numResources; i++) {
+            request[i] = scanner.nextInt();
+        }
+
+        if (bankersAlgorithm.requestResources(processId, request)) {
+            System.out.println("The request has been granted.");
+        } else {
+            System.out.println("The request has been denied.");
+        }
+
+        scanner.close();
+    }
+}

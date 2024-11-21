@@ -1,0 +1,23 @@
+import java.util.concurrent.Semaphore;
+
+class ReaderWriterProblem {
+    private static Semaphore readLock = new Semaphore(1);  // Semaphore for readers
+    private static Semaphore writeLock = new Semaphore(1); // Semaphore for writers
+    private static int readerCount = 0;                   // Number of active readers
+
+    static class Reader implements Runnable {
+        @Override
+        public void run() {
+            try {
+                // Acquire the readLock to modify readerCount
+                readLock.acquire();
+                readerCount++;
+                if (readerCount == 1) {
+                    // First reader locks the write access
+                    writeLock.acquire();
+                }
+                readLock.release();
+
+                // Reading section
+                System.out.println(Thread.currentThread().getName() + " is reading...");
+                Thread.sleep(1000); // Sim

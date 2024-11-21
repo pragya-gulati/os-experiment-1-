@@ -1,0 +1,44 @@
+def round_robin(processes, time_quantum):
+    n = len(processes)
+    remaining_time = [p['burst_time'] for p in processes]  # Remaining burst time
+    waiting_time = [0] * n
+    turnaround_time = [0] * n
+    completion_time = [0] * n
+
+    current_time = 0
+    queue = [i for i in range(n)]  # Queue to store process indices
+    while queue:
+        idx = queue.pop(0)  # Get the process at the front of the queue
+
+        if remaining_time[idx] > time_quantum:
+            # Process is not finished; execute for the time quantum
+            current_time += time_quantum
+            remaining_time[idx] -= time_quantum
+            queue.append(idx)  # Re-add to queue for further execution
+        else:
+            # Process will finish in this cycle
+            current_time += remaining_time[idx]
+            completion_time[idx] = current_time
+            turnaround_time[idx] = completion_time[idx] - processes[idx]['arrival_time']
+            waiting_time[idx] = turnaround_time[idx] - processes[idx]['burst_time']
+            remaining_time[idx] = 0
+
+    # Print results
+    print("Process\tArrival\tBurst\tCompletion\tTurnaround\tWaiting")
+    for i in range(n):
+        print(
+            f"P{i+1}\t{processes[i]['arrival_time']}\t{processes[i]['burst_time']}\t{completion_time[i]}"
+            f"\t\t{turnaround_time[i]}\t\t{waiting_time[i]}"
+        )
+
+# Example Input
+processes = [
+    {'arrival_time': 0, 'burst_time': 8},  # Process 1
+    {'arrival_time': 1, 'burst_time': 4},  # Process 2
+    {'arrival_time': 2, 'burst_time': 9},  # Process 3
+    {'arrival_time': 3, 'burst_time': 5},  # Process 4
+]
+time_quantum = 3
+
+# Call the Round Robin function
+round_robin(processes, time_quantum)

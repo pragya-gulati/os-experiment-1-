@@ -1,0 +1,62 @@
+def srtf(processes):
+    # Sort processes by arrival time
+    processes.sort(key=lambda x: x['arrival_time'])
+
+    n = len(processes)
+    remaining_time = [p['burst_time'] for p in processes]  # Remaining burst time for each process
+    completion_time = [0] * n
+    waiting_time = [0] * n
+    turnaround_time = [0] * n
+
+    current_time = 0
+    completed = 0
+    shortest = -1
+    min_remaining_time = float('inf')
+
+    while completed < n:
+        # Find the process with the shortest remaining time at the current time
+        for i in range(n):
+            if (
+                processes[i]['arrival_time'] <= current_time  # Process has arrived
+                and remaining_time[i] < min_remaining_time  # Shorter remaining burst time
+                and remaining_time[i] > 0  # Process not completed
+            ):
+                min_remaining_time = remaining_time[i]
+                shortest = i
+
+        if shortest == -1:  # No process is ready, move to the next time unit
+            current_time += 1
+            continue
+
+        # Execute the selected process for 1 time unit
+        remaining_time[shortest] -= 1
+        current_time += 1
+
+        # Update if the process is completed
+        if remaining_time[shortest] == 0:
+            completed += 1
+            min_remaining_time = float('inf')  # Reset min remaining time
+            completion_time[shortest] = current_time
+            turnaround_time[shortest] = completion_time[shortest] - processes[shortest]['arrival_time']
+            waiting_time[shortest] = turnaround_time[shortest] - processes[shortest]['burst_time']
+
+        shortest = -1  # Reset the shortest process for the next iteration
+
+    # Print results
+    print("Process\tArrival\tBurst\tCompletion\tTurnaround\tWaiting")
+    for i in range(n):
+        print(
+            f"P{i+1}\t{processes[i]['arrival_time']}\t{processes[i]['burst_time']}\t{completion_time[i]}"
+            f"\t\t{turnaround_time[i]}\t\t{waiting_time[i]}"
+        )
+
+# Example Input
+processes = [
+    {'arrival_time': 0, 'burst_time': 8},  # Process 1
+    {'arrival_time': 1, 'burst_time': 4},  # Process 2
+    {'arrival_time': 2, 'burst_time': 9},  # Process 3
+    {'arrival_time': 3, 'burst_time': 5},  # Process 4
+]
+
+# Call the SRTF function
+srtf

@@ -1,0 +1,50 @@
+ii) FCFS without Arrival Time\
+
+
+import java.util.Scanner;
+
+class ProcessNoArrival {
+    int pid; // Process ID
+    int burstTime; // Burst time of the process
+    int completionTime; // Completion time of the process
+    int waitingTime; // Waiting time of the process
+    int turnAroundTime; // Turnaround time of the process
+
+    public ProcessNoArrival(int pid, int burstTime) {
+        this.pid = pid;
+        this.burstTime = burstTime;
+    }
+}
+
+public class FCFSWithoutArrivalTime {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Enter the number of processes:");
+        int n = scanner.nextInt();
+        ProcessNoArrival[] processes = new ProcessNoArrival[n];
+
+        for (int i = 0; i < n; i++) {
+            System.out.println("Enter burst time for process " + (i + 1) + ":");
+            int burstTime = scanner.nextInt();
+            processes[i] = new ProcessNoArrival(i + 1, burstTime);
+        }
+
+        int currentTime = 0;
+        for (ProcessNoArrival process : processes) {
+            process.completionTime = currentTime + process.burstTime;
+            process.turnAroundTime = process.completionTime;
+            process.waitingTime = process.turnAroundTime - process.burstTime;
+            currentTime = process.completionTime;
+        }
+
+        System.out.println("\nProcess\tBurst Time\tCompletion Time\tTurnaround Time\tWaiting Time");
+        for (ProcessNoArrival process : processes) {
+            System.out.println("P" + process.pid + "\t\t" + process.burstTime + "\t\t" +
+                    process.completionTime + "\t\t" + process.turnAroundTime + "\t\t" + process.waitingTime);
+        }
+
+        scanner.close();
+    }
+}
