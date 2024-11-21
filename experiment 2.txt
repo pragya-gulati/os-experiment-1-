@@ -1,0 +1,75 @@
+ a) #!/bin/bash
+# This script prints Hello World
+echo "Hello World"
+
+
+ b ) 
+#!/bin/bash
+# This script calculates the factorial of a given number
+
+echo "Enter a number:"
+read num
+
+factorial=1
+for (( i=1; i<=num; i++ ))
+do
+    factorial=$((factorial * i))
+done
+
+echo "Factorial of $num is $factorial"
+
+c) #!/bin/bash
+# This script calculates the gross salary of an employee
+
+echo "Enter Basic Salary:"
+read basic
+
+# Assuming HRA as 10% of basic salary and DA as 20% of basic salary
+hra=$((basic * 10 / 100))
+da=$((basic * 20 / 100))
+
+gross_salary=$((basic + hra + da))
+
+echo "Gross Salary is $gross_salary"
+
+d) #!/bin/bash
+# This script displays a menu and executes the chosen option
+
+while true; do
+    echo "Select an option:"
+    echo "1. List of files"
+    echo "2. Process Status"
+    echo "3. Date"
+    echo "4. Users in Program"
+    echo "5. Quit"
+    echo "Enter your choice: "
+    read choice
+
+    case $choice in
+        1) 
+            echo "List of files:"
+            ls
+            ;;
+        2) 
+            echo "Process Status:"
+            ps
+            ;;
+        3) 
+            echo "Current Date and Time:"
+            date
+            ;;
+        4) 
+            echo "Users currently logged in:"
+            who
+            ;;
+        5) 
+            echo "Exiting the program."
+            break
+            ;;
+        *) 
+            echo "Invalid choice. Please select an option from 1 to 5."
+            ;;
+    esac
+    echo ""
+done
+ 
